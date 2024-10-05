@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2024, Sartaj Hussain. All rights reserved.
+ * Project: quick-cache
+*/
+package com.sartaj.cache.impl;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.sartaj.cache.impl.model.Sample;
+import com.sartaj.cache.model.CacheStore;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class InMemoryCacheTest {
+
+  private InMemoryCache<String> inMemoryCache;
+
+  @BeforeEach
+  public void setUp() {
+    CacheStore<String> cacheStore = CacheStore.<String>builder().capacity(20).build();
+    inMemoryCache = new InMemoryCache<>(cacheStore);
+  }
+
+  @AfterEach
+  public void tearDown() {
+    inMemoryCache.purge();
+  }
+
+  @Test
+  public void testIfSoreIsAbleToStoreInitialValue() {
+    UUID orderId = UUID.randomUUID();
+    UUID expected = inMemoryCache.put("orderId", orderId).orElseThrow();
+    assertEquals(expected, orderId);
+  }
+
+  @Test
+  public void testIfStoreDataIsRetrieved() {
+    UUID orderId = UUID.randomUUID();
+    Optional<UUID> expected = inMemoryCache.put("orderId", orderId);
+    Optional<UUID> actual = inMemoryCache.get("orderId", UUID.class);
+
+    assertEquals(expected, actual);
+  }
+
+  @Test
+  public void testIfStoredDataRemoved() {
+    UUID orderId = UUID.randomUUID();
+    Optional<UUID> expected = inMemoryCache.put("orderId", orderId);
+    Optional<UUID> actual = inMemoryCache.get("orderId", UUID.class);
+
+    assertEquals(expected, actual);
+
+    Optional<UUID> removedActual = inMemoryCache.remove("orderId", UUID.class);
+
+    assertEquals(expected, removedActual);
+    assertEquals(0, inMemoryCache.size());
+  }
+
+  @Test
+  public void testIfPurgeSuccess() {
+
+    IntStream.range(0, 200)
+        .forEachOrdered(
+            value -> {
+              UUID orderId = UUID.randomUUID();
+              inMemoryCache.put(orderId.toString(), value);
+            });
+
+    assertEquals(inMemoryCache.capacity(), inMemoryCache.size());
+    inMemoryCache.purge();
+    assertEquals(0, inMemoryCache.size());
+  }
+
+  @Test
+  public void testIfStoringAClassObjectThenItShouldAllow() {
+    UUID orderId = UUID.randomUUID();
+
+    Sample cacheValue =
+        Sample.builder().id(UUID.randomUUID()).name("Alex").date(new Date()).build();
+    Optional<Sample> expected = inMemoryCache.put(orderId.toString(), cacheValue);
+    Optional<Sample> actual = inMemoryCache.get(orderId.toString(), Sample.class);
+
+    assertEquals(expected, actual);
+  }
+}
