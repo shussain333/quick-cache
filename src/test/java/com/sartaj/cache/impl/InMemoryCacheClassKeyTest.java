@@ -34,7 +34,7 @@ public class InMemoryCacheClassKeyTest {
   public void testIfUsingClassAsAKeyThenItShouldWork() {
     Date dtInput = new Date();
     Date dtOutput = new Date();
-    UUID id = UUID.randomUUID()
+    UUID id = UUID.randomUUID();
     Sample cacheKeyInput = Sample.builder().id(id).name("Alex").date(dtInput).build();
 
     Sample cacheKeyOutput = Sample.builder().id(id).name("Alex").date(dtOutput).build();
