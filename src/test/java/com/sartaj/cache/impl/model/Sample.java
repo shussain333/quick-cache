@@ -1,7 +1,9 @@
-/*
- * Copyright (C) 2024, Sartaj Hussain. All rights reserved.
+/**
+ * Copyright (C) 2024, Sartaj Hussain.
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  * Project: quick-cache
-*/
+ * @author sartajhussain
+ */
 package com.sartaj.cache.impl.model;
 
 import java.util.Date;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Sample {
 
-  private UUID id;
-  private String name;
-  private Date date;
+    private UUID id;
+    private String name;
+    private Date date;
 }

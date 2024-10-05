@@ -94,7 +94,14 @@
 							<style>GOOGLE</style>
 							<reflowLongStrings>true</reflowLongStrings>
 						</googleJavaFormat>
-
+						<indent>
+							<tabs>true</tabs>
+							<spacesPerTab>2</spacesPerTab>
+						</indent>
+						<indent>
+							<spaces>true</spaces>
+							<spacesPerTab>4</spacesPerTab>
+						</indent>
 						<formatAnnotations />
 						<licenseHeader>
 							<file>${project.basedir}/license-header</file>

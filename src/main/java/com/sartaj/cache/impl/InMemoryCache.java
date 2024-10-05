@@ -1,7 +1,9 @@
-/*
- * Copyright (C) 2024, Sartaj Hussain. All rights reserved.
+/**
+ * Copyright (C) 2024, Sartaj Hussain.
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  * Project: quick-cache
-*/
+ * @author sartajhussain
+ */
 package com.sartaj.cache.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,126 +20,127 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
 
-// @Component
-// @Profile("local_cache")
+/**
+ * @author sartajhussain
+ */
 @Slf4j
 public class InMemoryCache<K> implements ICache<K> {
-  private final CacheStore<K> store;
+    private final CacheStore<K> store;
 
-  public InMemoryCache(CacheStore<K> store) {
-    this.store = store;
-  }
-
-  @Override
-  public <V> Optional<V> put(K key, V value) {
-    synchronized (this) {
-      if (getKeyTrack().size() == capacity()) {
-        K firstKey = getKeyTrack().stream().findFirst().orElseThrow();
-        getKeyTrack().remove(firstKey);
-        getCache().remove(firstKey);
-      }
-
-      getCache().put(key, write(key, value));
-      getKeyTrack().remove(key);
-      getKeyTrack().add(key);
+    public InMemoryCache(CacheStore<K> store) {
+        this.store = store;
     }
-    return (Optional<V>) get(key, value.getClass());
-  }
 
-  @Override
-  public <V> Optional<V> get(K key, Class<V> cacheValueType) {
-    return read(key, cacheValueType);
-  }
+    @Override
+    public <V> Optional<V> put(K key, V value) {
+        synchronized (this) {
+            if (getKeyTrack().size() == capacity()) {
+                K firstKey = getKeyTrack().stream().findFirst().orElseThrow();
+                getKeyTrack().remove(firstKey);
+                getCache().remove(firstKey);
+            }
 
-  @Override
-  public <V, T> V execute(K key, Class<V> cacheValueType, T input, Function<T, V> definition) {
-    Optional<V> cacheValue = get(key, cacheValueType);
-
-    return cacheValue.orElseGet(
-        () -> {
-          V value = definition.apply(input);
-          put(key, value);
-          return value;
-        });
-  }
-
-  @Override
-  public <V> V execute(K key, Class<V> cacheValueType, Supplier<V> supplier) {
-    Optional<V> cacheValue = get(key, cacheValueType);
-
-    return cacheValue.orElseGet(
-        () -> {
-          V value = supplier.get();
-          put(key, value);
-          return value;
-        });
-  }
-
-  @Override
-  public <V> Optional<V> remove(K key, Class<V> cacheValueType) {
-    synchronized (this) {
-      Optional<V> optionalV = read(key, cacheValueType);
-      Optional<CacheValue<K>> kCacheValue = Optional.ofNullable(getCache().remove(key));
-      getKeyTrack().remove(key);
-
-      if (kCacheValue.isPresent()) {
-        return optionalV;
-      }
+            getCache().put(key, write(key, value));
+            getKeyTrack().remove(key);
+            getKeyTrack().add(key);
+        }
+        return (Optional<V>) get(key, value.getClass());
     }
-    return Optional.empty();
-  }
 
-  @Override
-  public Integer size() {
-    return getCache().size();
-  }
-
-  @Override
-  public void purge() {
-    getKeyTrack().clear();
-    getCache().clear();
-  }
-
-  @Override
-  public Integer capacity() {
-    return store.getCapacity();
-  }
-
-  private LinkedHashSet<K> getKeyTrack() {
-    return store.getKeyTrack();
-  }
-
-  private Map<K, CacheValue<K>> getCache() {
-    return store.getCache();
-  }
-
-  private ObjectMapper getObjectMapper() {
-    return store.getObjectMapper();
-  }
-
-  private <V> CacheValue<K> write(K key, V cacheValue) {
-    try {
-      String value =
-          getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(cacheValue);
-      return CacheValue.<K>builder().key(key).value(value).build();
-    } catch (JsonProcessingException e) {
-      throw new QuickCacheJsonParseException(
-          String.format("Something when wrong while writing cache for key %s", key));
+    @Override
+    public <V> Optional<V> get(K key, Class<V> cacheValueType) {
+        return read(key, cacheValueType);
     }
-  }
 
-  private <V> Optional<V> read(K key, Class<V> valueClass) {
-    try {
-      CacheValue<K> cacheValue = getCache().getOrDefault(key, null);
+    @Override
+    public <V, T> V execute(K key, Class<V> cacheValueType, T input, Function<T, V> definition) {
+        Optional<V> cacheValue = get(key, cacheValueType);
 
-      if (Objects.isNull(cacheValue)) {
+        return cacheValue.orElseGet(
+                () -> {
+                    V value = definition.apply(input);
+                    put(key, value);
+                    return value;
+                });
+    }
+
+    @Override
+    public <V> V execute(K key, Class<V> cacheValueType, Supplier<V> supplier) {
+        Optional<V> cacheValue = get(key, cacheValueType);
+
+        return cacheValue.orElseGet(
+                () -> {
+                    V value = supplier.get();
+                    put(key, value);
+                    return value;
+                });
+    }
+
+    @Override
+    public <V> Optional<V> remove(K key, Class<V> cacheValueType) {
+        synchronized (this) {
+            Optional<V> optionalV = read(key, cacheValueType);
+            Optional<CacheValue<K>> kCacheValue = Optional.ofNullable(getCache().remove(key));
+            getKeyTrack().remove(key);
+
+            if (kCacheValue.isPresent()) {
+                return optionalV;
+            }
+        }
         return Optional.empty();
-      }
-      V val = getObjectMapper().readValue(cacheValue.getValue(), valueClass);
-      return Optional.ofNullable(val);
-    } catch (JsonProcessingException ex) {
-      log.info("Failed to retrieve the record", ex);
-      throw new RuntimeException(ex);
     }
-  }
+
+    @Override
+    public Integer size() {
+        return getCache().size();
+    }
+
+    @Override
+    public void purge() {
+        getKeyTrack().clear();
+        getCache().clear();
+    }
+
+    @Override
+    public Integer capacity() {
+        return store.getCapacity();
+    }
+
+    private LinkedHashSet<K> getKeyTrack() {
+        return store.getKeyTrack();
+    }
+
+    private Map<K, CacheValue<K>> getCache() {
+        return store.getCache();
+    }
+
+    private ObjectMapper getObjectMapper() {
+        return store.getObjectMapper();
+    }
+
+    private <V> CacheValue<K> write(K key, V cacheValue) {
+        try {
+            String value =
+                    getObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(cacheValue);
+            return CacheValue.<K>builder().key(key).value(value).build();
+        } catch (JsonProcessingException e) {
+            throw new QuickCacheJsonParseException(
+                    String.format("Something when wrong while writing cache for key %s", key));
+        }
+    }
+
+    private <V> Optional<V> read(K key, Class<V> valueClass) {
+        try {
+            CacheValue<K> cacheValue = getCache().getOrDefault(key, null);
+
+            if (Objects.isNull(cacheValue)) {
+                return Optional.empty();
+            }
+            V val = getObjectMapper().readValue(cacheValue.getValue(), valueClass);
+            return Optional.ofNullable(val);
+        } catch (JsonProcessingException ex) {
+            log.info("Failed to retrieve the record", ex);
+            throw new RuntimeException(ex);
+        }
+    }
 }

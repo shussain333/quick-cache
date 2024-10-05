@@ -1,7 +1,9 @@
-/*
- * Copyright (C) 2024, Sartaj Hussain. All rights reserved.
+/**
+ * Copyright (C) 2024, Sartaj Hussain.
+ * http://www.apache.org/licenses/LICENSE-2.0.txt
  * Project: quick-cache
-*/
+ * @author sartajhussain
+ */
 package com.sartaj.cache.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,31 +19,31 @@ import org.junit.jupiter.api.Test;
 
 public class InMemoryCacheClassKeyTest {
 
-  private InMemoryCache<Sample> inMemoryCache;
+    private InMemoryCache<Sample> inMemoryCache;
 
-  @BeforeEach
-  public void setUp() {
-    CacheStore<Sample> cacheStore = CacheStore.<Sample>builder().capacity(20).build();
-    inMemoryCache = new InMemoryCache<>(cacheStore);
-  }
+    @BeforeEach
+    public void setUp() {
+        CacheStore<Sample> cacheStore = CacheStore.<Sample>builder().capacity(20).build();
+        inMemoryCache = new InMemoryCache<>(cacheStore);
+    }
 
-  @AfterEach
-  public void tearDown() {
-    inMemoryCache.purge();
-  }
+    @AfterEach
+    public void tearDown() {
+        inMemoryCache.purge();
+    }
 
-  @Test
-  public void testIfUsingClassAsAKeyThenItShouldWork() {
-    Date dtInput = new Date();
-    Date dtOutput = new Date();
-    UUID id = UUID.randomUUID();
-    Sample cacheKeyInput = Sample.builder().id(id).name("Alex").date(dtInput).build();
+    @Test
+    public void testIfUsingClassAsAKeyThenItShouldWork() {
+        Date dtInput = new Date();
+        Date dtOutput = new Date();
+        UUID id = UUID.randomUUID();
+        Sample cacheKeyInput = Sample.builder().id(id).name("Alex").date(dtInput).build();
 
-    Sample cacheKeyOutput = Sample.builder().id(id).name("Alex").date(dtOutput).build();
+        Sample cacheKeyOutput = Sample.builder().id(id).name("Alex").date(dtOutput).build();
 
-    Optional<String> expected = inMemoryCache.put(cacheKeyInput, "Value for class key");
-    Optional<String> actual = inMemoryCache.get(cacheKeyOutput, String.class);
+        Optional<String> expected = inMemoryCache.put(cacheKeyInput, "Value for class key");
+        Optional<String> actual = inMemoryCache.get(cacheKeyOutput, String.class);
 
-    assertEquals(expected, actual);
-  }
+        assertEquals(expected, actual);
+    }
 }
