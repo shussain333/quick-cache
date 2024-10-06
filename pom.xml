@@ -26,7 +26,7 @@
 			<name>Sartaj Hussain</name>
 			<email>sartajhussain3786@gmail.com</email>
 			<roles>
-				<role>Owner</role>
+				<role>developer</role>
 			</roles>
 		</developer>
 	</developers>
@@ -47,41 +47,29 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
-<!--			<version>${spring.version}</version>-->
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
-<!--			<version>${spring.version}</version>-->
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-json</artifactId>
-<!--			<version>${spring.version}</version>-->
 			<optional>true</optional>
 		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-<!--			<version>${lombok.version}</version>-->
 			<scope>provided</scope>
-<!--			<optional>true</optional>-->
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-<!--			<version>${spring.version}</version>-->
 			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mockito</groupId>
-					<artifactId>mockito-core</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 	</dependencies>
 
@@ -145,9 +133,9 @@
 				<version>3.3.0</version>
 				<configuration>
 					<excludes>
-						<exclude>com/sartaj/cache/internal/**</exclude> <!-- Adjust this to your package structure -->
-						<exclude>**/*.properties</exclude> <!-- Exclude all .properties files -->
-						<exclude>**/*.txt</exclude> <!-- Exclude all .txt files -->
+						<exclude>com/sartaj/cache/internal/**</exclude>
+						<exclude>**/*.properties</exclude>
+						<exclude>**/*.txt</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
