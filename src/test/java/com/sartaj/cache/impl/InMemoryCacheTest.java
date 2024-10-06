@@ -37,7 +37,7 @@ public class InMemoryCacheTest {
     }
 
     @Test
-    public void testIfSoreIsAbleToStoreInitialValue() {
+    public void testIfStoreIsAbleToStoreInitialValue() {
         UUID orderId = UUID.randomUUID();
         UUID expected = inMemoryCache.put("orderId", orderId).orElseThrow();
         assertEquals(expected, orderId);
