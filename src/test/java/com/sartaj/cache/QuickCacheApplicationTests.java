@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.sartaj.cache.factory.InMemoryCacheFactory;
 import com.sartaj.cache.impl.InMemoryCache;
+import com.sartaj.cache.internal.QuickCacheApplication;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * @author sartajhussain
  */
-@SpringBootTest
+@SpringBootTest(classes = QuickCacheApplication.class)
 class QuickCacheApplicationTests {
 
     @Autowired InMemoryCacheFactory inMemoryCacheFactory;

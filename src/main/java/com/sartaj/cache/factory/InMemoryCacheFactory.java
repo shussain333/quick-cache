@@ -7,8 +7,11 @@
 package com.sartaj.cache.factory;
 
 import com.sartaj.cache.config.CacheConfig;
+import com.sartaj.cache.config.SingleCacheProps;
+import com.sartaj.cache.exception.QuickCacheInvalidContextException;
 import com.sartaj.cache.impl.InMemoryCache;
 import com.sartaj.cache.model.CacheStore;
+import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,7 +27,17 @@ public class InMemoryCacheFactory {
     }
 
     public <K> InMemoryCache<K> getInMemoryCache(String context) {
-        CacheStore<K> cacheStore = (CacheStore<K>) cacheConfig.getSingleProp(context).getStore();
+        Optional<SingleCacheProps> singleCacheProps = this.cacheConfig.getSingleProp(context);
+
+        CacheStore<K> cacheStore =
+                (CacheStore<K>)
+                        singleCacheProps
+                                .orElseThrow(
+                                        () ->
+                                                new QuickCacheInvalidContextException(
+                                                        String.format("Cache store is not configured for %s", context)))
+                                .getStore();
+
         return new InMemoryCache<>(cacheStore);
     }
 }

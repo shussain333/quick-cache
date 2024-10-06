@@ -4,12 +4,14 @@
  * Project: quick-cache
  * @author sartajhussain
  */
-package com.sartaj.cache;
+package com.sartaj.cache.internal;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+@ComponentScan(value = "com.sartaj.cache")
 public class QuickCacheApplication {
 
     public static void main(String[] args) {

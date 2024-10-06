@@ -28,6 +28,7 @@ public class InMemoryCache<K> implements ICache<K> {
     private final CacheStore<K> store;
 
     public InMemoryCache(CacheStore<K> store) {
+        Objects.requireNonNull(store, "Store is not present");
         this.store = store;
     }
 
