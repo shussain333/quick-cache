@@ -39,7 +39,6 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring.version>3.3.4</spring.version>
-		<maven.compiler.release>17</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
@@ -155,4 +154,10 @@
 			</plugin>
 		</plugins>
 	</build>
+	<!--<server>
+		<id>${server}</id>
+		<username>HgbQJARW</username>
+		<password>uOK4eyiSo66Hd47z8yVYx95KwuxMRpMSDUiH8jJ+FcAC</password>
+	</server>
+-->
 </project>
