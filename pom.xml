@@ -143,21 +143,15 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<source>17</source>
-					<target>17</target>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-compiler-plugin</artifactId>-->
+<!--				<version>3.10.1</version>-->
+<!--				<configuration>-->
+<!--					<source>17</source>-->
+<!--					<target>17</target>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 		</plugins>
 	</build>
-	<!--<server>
-		<id>${server}</id>
-		<username>HgbQJARW</username>
-		<password>uOK4eyiSo66Hd47z8yVYx95KwuxMRpMSDUiH8jJ+FcAC</password>
-	</server>
--->
 </project>
