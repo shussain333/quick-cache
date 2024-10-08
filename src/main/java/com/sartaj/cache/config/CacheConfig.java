@@ -8,9 +8,11 @@ package com.sartaj.cache.config;
 
 import com.sartaj.cache.exception.QuickCacheConflictException;
 import com.sartaj.cache.exception.QuickCacheInvalidContextException;
+import com.sartaj.cache.model.AppCache;
 import jakarta.annotation.PostConstruct;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -40,6 +42,9 @@ public class CacheConfig {
                             + " context. Both are not allowed at once.");
         }
         log.info("Quick-Cache initialized successfully");
+        log.info("=======================================================================");
+        logStatistics().forEach(log::info);
+        log.info("=======================================================================");
     }
 
     /**
@@ -53,18 +58,53 @@ public class CacheConfig {
     }
 
     private Optional<SingleCacheProps> getSinglePropFromMultiCache(String context) {
-        multiCacheProps.ifPresent(
-                mc ->
-                        Optional.ofNullable(mc.getMultiCache())
-                                .orElseThrow(
-                                        () ->
-                                                new QuickCacheInvalidContextException(
-                                                        String.format(
-                                                                "Given context %s is invalid and there is no cache store present"
-                                                                        + " for this. Please check configuration file if you have"
-                                                                        + " enabled cache for property"
-                                                                        + " com.sartaj.quick-cache.multiCache.%s",
-                                                                context, context))));
+        multiCacheProps.ifPresent(mc -> getStringSingleCachePropsMap(context, mc));
         return multiCacheProps.map(cacheProps -> cacheProps.getMultiCache().get(context));
+    }
+
+    private static Map<String, SingleCacheProps> getStringSingleCachePropsMap(
+            String context, MultiCacheProps mc) {
+        return Optional.ofNullable(mc.getMultiCache())
+                .orElseThrow(
+                        () ->
+                                new QuickCacheInvalidContextException(
+                                        String.format(
+                                                "Given context %s is invalid and there is no cache store present"
+                                                        + " for this. Please check configuration file, if you have"
+                                                        + " enabled cache for property"
+                                                        + " com.sartaj.quick-cache.multiCache.%s",
+                                                context, context)));
+    }
+
+    public List<AppCache> toList() {
+        Stream.Builder<AppCache> cacheStream = Stream.builder();
+        singleCacheProps.ifPresent(
+                defaultCache -> {
+                    SingleCacheProps singleCache = singleCacheProps.get();
+                    cacheStream.add(
+                            AppCache.builder()
+                                    .context(defaultContext)
+                                    .capacity(singleCache.getMaxCapacity())
+                                    .evictionPolicy(singleCache.getEvictionPolicy())
+                                    .build());
+                });
+
+        if (multiCacheProps.isPresent() && Objects.nonNull(multiCacheProps.get().getMultiCache())) {
+            multiCacheProps.get().getMultiCache().entrySet().stream()
+                    .map(
+                            entry ->
+                                    AppCache.builder()
+                                            .context(entry.getKey())
+                                            .capacity(entry.getValue().getMaxCapacity())
+                                            .evictionPolicy(entry.getValue().getEvictionPolicy())
+                                            .build())
+                    .forEach(cacheStream::add);
+        }
+
+        return cacheStream.build().toList();
+    }
+
+    private List<String> logStatistics() {
+        return toList().stream().map(AppCache::toString).collect(Collectors.toList());
     }
 }

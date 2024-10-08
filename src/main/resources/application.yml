@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: quick-cache
+  profiles:
+    active: local_cache
+
+com:
+  sartaj:
+    quick-cache:
+      multiCache:
+        admin:
+          maxCapacity: 200
+          evictionPolicy: FIFO
+        user:
+          maxCapacity: 200
+          evictionPolicy: LFU
+#      default:
+#        maxCapacity=20:

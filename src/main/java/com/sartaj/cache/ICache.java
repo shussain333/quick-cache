@@ -6,6 +6,7 @@
  */
 package com.sartaj.cache;
 
+import com.sartaj.cache.eviction.IEviction;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -30,4 +31,6 @@ public interface ICache<K> {
     void purge();
 
     Integer capacity();
+
+    IEviction<K> getEvictPolicy();
 }

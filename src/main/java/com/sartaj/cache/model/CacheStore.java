@@ -7,31 +7,32 @@
 package com.sartaj.cache.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sartaj.cache.eviction.IEviction;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author sartajhussain
  */
 @Builder(builderClassName = "Builder", toBuilder = true)
 @Getter
+@Setter
 public class CacheStore<K> {
 
     private final Integer capacity;
-
     private Map<K, CacheValue<K>> cache;
-    private LinkedHashSet<K> keyTrack;
+    private IEviction<K> eviction;
     private ObjectMapper objectMapper;
 
     public static class Builder<K> {
         public CacheStore<K> build() {
             cache = new ConcurrentHashMap<>(capacity);
-            keyTrack = new LinkedHashSet<>(capacity);
             objectMapper = new ObjectMapper();
 
-            return new CacheStore<>(capacity, cache, keyTrack, objectMapper);
+            return new CacheStore<>(capacity, cache, eviction, objectMapper);
         }
     }
 }
