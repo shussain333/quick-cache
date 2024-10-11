@@ -9,10 +9,10 @@ package com.sartaj.cache.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sartaj.cache.ICache;
+import com.sartaj.cache.eviction.IEviction;
 import com.sartaj.cache.exception.QuickCacheJsonParseException;
 import com.sartaj.cache.model.CacheStore;
 import com.sartaj.cache.model.CacheValue;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,27 +35,26 @@ public class InMemoryCache<K> implements ICache<K> {
     @Override
     public <V> Optional<V> put(K key, V value) {
         synchronized (this) {
-            if (getKeyTrack().size() == capacity()) {
-                K firstKey = getKeyTrack().stream().findFirst().orElseThrow();
-                getKeyTrack().remove(firstKey);
-                getCache().remove(firstKey);
-            }
+            Optional<K> evictedKeyOp = getEvictPolicy().remove();
+            evictedKeyOp.ifPresent(evictedKey -> getCache().remove(evictedKey));
 
             getCache().put(key, write(key, value));
-            getKeyTrack().remove(key);
-            getKeyTrack().add(key);
+            getEvictPolicy().add(key);
         }
         return (Optional<V>) get(key, value.getClass());
     }
 
     @Override
     public <V> Optional<V> get(K key, Class<V> cacheValueType) {
-        return read(key, cacheValueType);
+        Optional<V> read = read(key, cacheValueType);
+        getEvictPolicy().remove(key);
+        getEvictPolicy().add(key);
+        return read;
     }
 
     @Override
     public <V, T> V execute(K key, Class<V> cacheValueType, T input, Function<T, V> definition) {
-        Optional<V> cacheValue = get(key, cacheValueType);
+        Optional<V> cacheValue = read(key, cacheValueType);
 
         return cacheValue.orElseGet(
                 () -> {
@@ -67,7 +66,7 @@ public class InMemoryCache<K> implements ICache<K> {
 
     @Override
     public <V> V execute(K key, Class<V> cacheValueType, Supplier<V> supplier) {
-        Optional<V> cacheValue = get(key, cacheValueType);
+        Optional<V> cacheValue = read(key, cacheValueType);
 
         return cacheValue.orElseGet(
                 () -> {
@@ -82,7 +81,7 @@ public class InMemoryCache<K> implements ICache<K> {
         synchronized (this) {
             Optional<V> optionalV = read(key, cacheValueType);
             Optional<CacheValue<K>> kCacheValue = Optional.ofNullable(getCache().remove(key));
-            getKeyTrack().remove(key);
+            getEvictPolicy().remove(key);
 
             if (kCacheValue.isPresent()) {
                 return optionalV;
@@ -98,7 +97,7 @@ public class InMemoryCache<K> implements ICache<K> {
 
     @Override
     public void purge() {
-        getKeyTrack().clear();
+        getEvictPolicy().clear();
         getCache().clear();
     }
 
@@ -107,8 +106,9 @@ public class InMemoryCache<K> implements ICache<K> {
         return store.getCapacity();
     }
 
-    private LinkedHashSet<K> getKeyTrack() {
-        return store.getKeyTrack();
+    @Override
+    public IEviction<K> getEvictPolicy() {
+        return store.getEviction();
     }
 
     private Map<K, CacheValue<K>> getCache() {

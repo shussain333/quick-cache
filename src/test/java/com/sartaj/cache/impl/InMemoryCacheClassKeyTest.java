@@ -8,6 +8,8 @@ package com.sartaj.cache.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.sartaj.cache.config.SingleCacheProps;
+import com.sartaj.cache.eviction.EvictionPolicy;
 import com.sartaj.cache.impl.model.Sample;
 import com.sartaj.cache.model.CacheStore;
 import java.util.Date;
@@ -23,7 +25,11 @@ public class InMemoryCacheClassKeyTest {
 
     @BeforeEach
     public void setUp() {
-        CacheStore<Sample> cacheStore = CacheStore.<Sample>builder().capacity(20).build();
+        SingleCacheProps singleCacheProps = new SingleCacheProps();
+        singleCacheProps.setEvictionPolicy(EvictionPolicy.LRU);
+        singleCacheProps.setMaxCapacity(20);
+
+        CacheStore<Sample> cacheStore = (CacheStore<Sample>) singleCacheProps.getStore();
         inMemoryCache = new InMemoryCache<>(cacheStore);
     }
 
