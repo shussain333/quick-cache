@@ -32,18 +32,98 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+#        server-id: central
+#        server-username: Z+N4e1vK
+#        server-password: 8R1T12TMhHoKemfc/h8FFcuRbnRFW2CI6N+T1ZC7vo7c
     - name: Check Java version
       run: java -version
     - name: Check maven version
       run: mvn --version
-    - name: List Dependency Tree
-      run: mvn dependency:tree
-    - name: Check linting status
-      run: mvn -B spotless:check --file pom.xml
-    - name: Test with Maven
-      run: mvn -B clean test --file pom.xml
-    - name: Build with Maven
-      run: mvn -B clean package -DskipTests=true --file pom.xml
+#    - name: List Dependency Tree
+#      run: mvn dependency:tree
+#    - name: Check linting status
+#      run: mvn -B spotless:check --file pom.xml
+#    - name: Test with Maven
+#      run: mvn -B clean test --file pom.xml
+#    - name: Build with Maven
+#      run: mvn -B clean package -DskipTests=true --file pom.xml
+    - name: Set up Git user
+      run: |
+        git config --global user.email "sartajhussain3786@gmail.com"
+        git config --global user.name "Sartaj Hussain"
+
+#    - name: Push Release Branch
+#      run: |
+#        git push origin release/${{ github.event.ref }}
+
+
+    - name: Create Maven settings.xml
+      run: |
+        mkdir -p ~/.m2
+        echo "<settings xmlns=\"http://maven.apache.org/SETTINGS/1.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd\">" > ~/.m2/settings.xml
+        echo "  <servers>" >> ~/.m2/settings.xml
+        echo "    <server>" >> ~/.m2/settings.xml
+        echo "      <id>central</id>" >> ~/.m2/settings.xml
+        echo "      <username>Z+N4e1vK</username>" >> ~/.m2/settings.xml
+        echo "      <password>8R1T12TMhHoKemfc/h8FFcuRbnRFW2CI6N+T1ZC7vo7c</password>" >> ~/.m2/settings.xml
+        echo "    </server>" >> ~/.m2/settings.xml
+        echo "  </servers>" >> ~/.m2/settings.xml
+        echo "</settings>" >> ~/.m2/settings.xml
+    - name: View settings.xml
+      run: cat ~/.m2/settings.xml
+
+    - name: Generate GPG key
+      run: |
+        gpg --full-generate-key --batch <<EOF
+        %no-protection
+        %transient
+        Key-Type: 1
+        Key-Length: 2048
+        Subkey-Type: 1
+        Subkey-Length: 2048
+        Name-Real: Sartaj Hussain
+        Name-Email: sartajhussain3786@gmail.com
+        EOF
+    - name: List GPG keys
+      run: gpg --list-secret-keys
+
+    - name: Extract Release Version
+      id: extract_version
+      run: |
+        # Extract version from the current pom.xml
+        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "Current version is $VERSION"
+        
+        # Remove the "-SNAPSHOT" suffix
+        RELEASE_VERSION=${VERSION/-SNAPSHOT/}
+        echo "Release version will be $RELEASE_VERSION"
+        
+        # Set the branch name
+        BRANCH_NAME="release/${RELEASE_VERSION}"
+        echo "Release branch name will be $BRANCH_NAME"
+        echo "::set-output name=branch::$BRANCH_NAME"
+        echo "::set-output name=release_version::$RELEASE_VERSION"
+
+    - name: Perform Release
+      run: |
+        git status
+        mvn clean release:prepare release:perform release:branch
+    - name: Push Release Branch
+      run: |
+        git push origin release/${{ github.event.ref }}      
+
+#    - name: Staging
+#      run: mvn -B clean package -DskipTests=true --file pom.xml -s ~/.m2/settings.xml -X
+    - name: Publish package
+      run: mvn -B clean package deploy -s ~/.m2/settings.xml --file pom.xml -X
+#      env:
+#        MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+#        MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+#        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+#    - name: release on github
+#      run: mvn --batch-mode deploy
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph

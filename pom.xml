@@ -8,13 +8,16 @@
 		<version>3.3.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.sartaj.cache</groupId>
+
+	<groupId>io.github.shussain333</groupId>
 	<artifactId>quick-cache</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>quick-cache</name>
+
+	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>jar</packaging>
-	<description>In-Memory cache support which can accept any type of key and any value. Also it provides multiple different caches based on context</description>
+	<description>In-Memory cache support, which can accept any type of key and any value. Also it provides multiple different caches based on context</description>
 	<url>https://github.com/shussain333/quick-cache-uses</url>
+
 	<licenses>
 		<license>
 			<name>Apache-2.0 license</name>
@@ -25,17 +28,45 @@
 		<developer>
 			<name>Sartaj Hussain</name>
 			<email>sartajhussain3786@gmail.com</email>
+			<organization>io.github.shussain333</organization>
+			<url>https://github.com/shussain333/quick-cache-uses</url>
 			<roles>
 				<role>developer</role>
 			</roles>
 		</developer>
 	</developers>
+
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:git://github.com/shussain333/quick-cache.git</connection>
+		<developerConnection>scm:git:ssh://github.com/shussain333/quick-cache.git</developerConnection>
+		<url>https://github.com/shussain333/quick-cache/tree/main</url>
 	</scm>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>central</id>
+			<url>https://central.sonatype.com/content/repositories/snapshots</url>
+			<layout>default</layout>
+		</snapshotRepository>
+		<repository>
+			<id>central</id>
+<!--			<url>https://repo1.maven.org/maven2/</url>-->
+			<url>https://central.sonatype.com/service/local/staging/deploy/maven2/</url>
+			<layout>default</layout>
+		</repository>
+<!--		<repository>-->
+<!--			<id>ossrh</id>-->
+<!--			<name>Central Repository OSSRH</name>-->
+<!--			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
+<!--		</repository>-->
+		<!--<repository>
+			<id>github</id>
+			<name>Quick cache package</name>
+			<url>https://maven.pkg.github.com/shussain333/quick-cache</url>
+		</repository>-->
+	</distributionManagement>
+
+
 	<properties>
 		<java.version>17</java.version>
 		<spring.version>3.3.4</spring.version>
@@ -157,6 +188,78 @@
 							<version>${lombok.version}</version>
 						</path>
 					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+
+			<!-- deploy package -->
+
+			<!--Staging-->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.7.0</version>
+				<extensions>true</extensions>
+<!--				<configuration>-->
+<!--					<serverId>central</serverId>-->
+<!--					<nexusUrl>https://central.sonatype.com/</nexusUrl>-->
+<!--					<autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+<!--				</configuration>-->
+			</plugin>
+
+			<!--Generate source-->
+			<!--<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.3.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+&lt;!&ndash;							<goal>jar-no-fork</goal>&ndash;&gt;
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			&lt;!&ndash;Generate javadoc&ndash;&gt;
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.8.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>-->
+
+			<!--GPG signed component-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.2.7</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.6.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
 				</configuration>
 			</plugin>
 		</plugins>
