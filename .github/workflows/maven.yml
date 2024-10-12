@@ -10,24 +10,24 @@ name: Quick cache pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "Fixing-pipeline" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
 
-permissions:
-  contents: write
-  actions: read
+#permissions:
+#  contents: write
+#  actions: read
 
 jobs:
   build_test:
-
     runs-on: ubuntu-latest
 #    if: ${{ (github.event_name != 'workflow_dispatch') && (github.event_name == 'push' || github.event_name == 'pull_request') }}
     steps:
     - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GIT_TOKEN }}
+#      with:
+#        fetch-depth: 0
+#        token: ${{ secrets.GIT_TOKEN }}
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -49,10 +49,13 @@ jobs:
 #      run: mvn -B clean test --file pom.xml
 #    - name: Build with Maven
 #      run: mvn -B clean package -DskipTests=true --file pom.xml
+    - name: Show Git Config
+      run: git config --list
     - name: Set up Git user
       run: |
         git config --global user.email "sartajhussain3786@gmail.com"
-        git config --global user.name "Sartaj Hussain"
+        git config --global user.name "shussain333"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
 #    - name: Push Release Branch
 #      run: |
@@ -106,13 +109,23 @@ jobs:
         echo "::set-output name=branch::$BRANCH_NAME"
         echo "::set-output name=release_version::$RELEASE_VERSION"
 
+    - name: Create Release Branch
+      run: |
+        BRANCH_NAME="${{ steps.extract_version.outputs.branch }}"
+        echo "Release branch name to be used: ${BRANCH_NAME}"
+        git checkout -b ${BRANCH_NAME}
+
+
+    - name: Prepare Release
+      run: mvn clean release:prepare
+
     - name: Perform Release
+      run: mvn release:perform
+
+    - name: Push Changes
       run: |
-        git status
-        mvn clean release:prepare release:perform release:branch
-    - name: Push Release Branch
-      run: |
-        git push origin release/${{ github.event.ref }}      
+        git push origin release/${{ env.release_version }}
+        
 
 #    - name: Staging
 #      run: mvn -B clean package -DskipTests=true --file pom.xml -s ~/.m2/settings.xml -X
