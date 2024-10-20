@@ -10,7 +10,7 @@
 
 	<groupId>io.github.shussain333</groupId>
 	<artifactId>quick-cache</artifactId>
-	<version>-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>jar</packaging>
@@ -189,8 +189,7 @@
 					<execution>
 						<id>attach-sources</id>
 						<goals>
-<!--							<goal>jar-no-fork</goal>-->
-							<goal>jar</goal>
+							<goal>jar-no-fork</goal>
 						</goals>
 					</execution>
 				</executions>

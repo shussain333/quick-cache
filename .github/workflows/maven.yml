@@ -14,6 +14,16 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      releaseType:
+        description: 'Release type (major, minor, patch)'
+        required: true
+        type: choice
+        default: patch
+        options:
+          - major
+          - minor
+          - patch
 
 jobs:
   build_test:
@@ -96,6 +106,11 @@ jobs:
           patch)
             new_version=$major.$minor.$((patch))
             next_dev_version=$major.$minor.$((patch + 1))
+            ;;
+          *)
+            echo "Invalid release type. Defaulting to patch."
+            new_version="$major.$minor.$((patch))"
+            next_dev_version="$major.$minor.$((patch + 1))"
             ;;
         esac
         
