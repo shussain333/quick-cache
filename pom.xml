@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.3.4</version>
-		<relativePath/>
+		<relativePath />
 	</parent>
 
 	<groupId>io.github.shussain333</groupId>
 	<artifactId>quick-cache</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>jar</packaging>
@@ -40,7 +39,8 @@
 		<connection>scm:git:git://github.com/shussain333/quick-cache.git</connection>
 		<developerConnection>scm:git:ssh://github.com/shussain333/quick-cache-uses.git</developerConnection>
 		<url>https://github.com/shussain333/quick-cache-uses.git</url>
-	</scm>
+	  <tag>v1.0.0</tag>
+  </scm>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -112,8 +112,8 @@
 								<include>.gitignore</include>
 							</includes>
 							<!-- define the steps to apply to those files -->
-							<trimTrailingWhitespace/>
-							<endWithNewline/>
+							<trimTrailingWhitespace />
+							<endWithNewline />
 							<indent>
 								<tabs>true</tabs>
 								<spacesPerTab>4</spacesPerTab>
