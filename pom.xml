@@ -10,7 +10,7 @@
 
 	<groupId>io.github.shussain333</groupId>
 	<artifactId>quick-cache</artifactId>
-	<version>1.0.3-SNAPSHOT</version>
+	<version>1.0.3</version>
 
 	<name>${project.groupId}:${project.artifactId}</name>
 	<packaging>jar</packaging>
@@ -39,7 +39,7 @@
 		<connection>scm:git:git://github.com/shussain333/quick-cache.git</connection>
 		<developerConnection>scm:git:ssh://github.com/shussain333/quick-cache-uses.git</developerConnection>
 		<url>https://github.com/shussain333/quick-cache-uses.git</url>
-	  <tag>HEAD</tag>
+	  <tag>v1.0.3</tag>
   </scm>
 
 	<distributionManagement>
