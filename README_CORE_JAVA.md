@@ -1,5 +1,3 @@
----
-
 # 2. Core Java Integration
 
 Quick Cache can also be used in standalone Core Java applications without Spring or Spring Boot.
